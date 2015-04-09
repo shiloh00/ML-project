@@ -8,8 +8,8 @@ In this project, we try to use AAM(Active Appearance Model) and ESR(Explicit Sha
 ## Dataset
 We use the following dataset which are commonly used by face alignment research:
 
-1. IBUG(http://ibug.doc.ic.ac.uk/resources/facial-point-annotations/)[2,3]
-2. Helen(http://www.ifp.illinois.edu/~vuongle2/helen/)[4]
+1. IBUG( http://ibug.doc.ic.ac.uk/resources/facial-point-annotations/ )[2,3]
+2. Helen( http://www.ifp.illinois.edu/~vuongle2/helen/ )[4]
 
 ## Preprocess
 
