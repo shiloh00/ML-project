@@ -28,4 +28,4 @@ Yang Yang, Haomin Hu, Can Wang, Lijun Tang
 
 [3] C. Sagonas, G. Tzimiropoulos, S. Zafeiriou, M. Pantic. 300 Faces in-the-Wild Challenge: The first facial landmark localization Challenge. Proceedings of IEEE Int’l Conf. on Computer Vision (ICCV-W 2013), 300 Faces in-the-Wild Challenge (300-W). Sydney, Australia, December 2013. 
 
-[4] Le, Vuong, et al. "Interactive facial feature localization." Computer Vision–ECCV 2012. Springer Berlin Heidelberg, 2012. 679-692.
+[4] Le, Vuong, et al. Interactive facial feature localization. Computer Vision–ECCV 2012. Springer Berlin Heidelberg, 2012. 679-692.
