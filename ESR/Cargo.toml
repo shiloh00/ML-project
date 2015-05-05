@@ -5,3 +5,5 @@ authors = ["Yang Yang <geraint0923@gmail.com>"]
 
 [dependencies]
 getopts = "0.2.10"
+nalgebra = "*"
+image = "*"
