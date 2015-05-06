@@ -1,6 +1,8 @@
 extern crate getopts;
 use getopts::Options;
 use std::env;
+extern crate esr;
+use esr::{Alignment,BoundingBox,Point};
 
 fn print_usage(program: &str, opts: Options) {
     //let brief = format!("Usage: {} [options]", program);
@@ -13,8 +15,8 @@ fn main() {
 
     let program = args[0].clone();
     let mut opts = Options::new();
-    //opts.reqopt("a", "action", "set the action for ESR, train/predict", "ACTION");
-    opts.reqopt("a", "action", "set the action for ESR, train/predict", "ACTION");
+    //opts.reqopt("a", "action", "set the action for esr, train/predict", "ACTION");
+    opts.reqopt("a", "action", "set the action for esr, train/predict", "ACTION");
     opts.reqopt("i", "input", "the input configure file (for train) or image (for predict)", "INPUT");
     opts.reqopt("m", "model", "set the path to the model to store (for train) or to load (for predict)", "MODEL");
     //opts.optflag("h", "help", "print the usage and help");
@@ -46,6 +48,8 @@ fn main() {
     match mode.as_ref() {
         "train" => {
             println!("You choose to train");
+            let mut alignment: Alignment = esr::Alignment::new();
+            alignment.feed_sample(&input,BoundingBox::new(0f64,0f64,0f64,0f64),Vec::new());
         },
         "predict" => {
             println!("You choose to train");
