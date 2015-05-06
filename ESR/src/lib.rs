@@ -4,7 +4,7 @@ extern crate nalgebra;
 mod regressor;
 
 use image::GenericImage;
-use nalgebra::{DMat};
+use nalgebra::{DMat,Indexable};
 use std::path::Path;
 
 use regressor::Regressor;
@@ -18,9 +18,9 @@ pub static NUM_FERN_PIXEL: usize = 5;
 pub struct Alignment {
     image_list: Vec<DMat<u8>>,
     bounding_box_list: Vec<BoundingBox>,
-    shape_list: Vec<Vec<Point>>,
+    shape_list: Vec<DMat<f64>>,
     regressor_list: Vec<Regressor>,
-    mean_shape: Vec<Point>,
+    mean_shape: DMat<f64>,
     num_landmark: usize,
     num_regressor: usize,
     trained: bool,
@@ -48,7 +48,7 @@ impl Alignment {
             bounding_box_list: Vec::new(),
             shape_list: Vec::new(),
             regressor_list: Vec::new(),
-            mean_shape: Vec::new(),
+            mean_shape: DMat::new_zeros(1,2),
             num_landmark: 0,
             num_regressor: 0,
             trained: false,
@@ -76,7 +76,16 @@ impl Alignment {
         self.num_landmark = shape.len();
         self.image_list.push(Alignment::read_image(path));
         self.bounding_box_list.push(bounding_box);
-        self.shape_list.push(shape);
+        //self.shape_list.push(shape);
+        let mut shape_mat: DMat<f64> = DMat::new_zeros(shape.len(), 2);
+        for idx in 0..shape.len() {
+            let point = &shape[idx];
+            //shape_mat.set((idx, 0), point.x);
+            //shape_mat.set((idx, 1), point.y);
+            shape_mat[(idx,0)] = point.x;
+            shape_mat[(idx,1)] = point.x;
+        }
+        self.shape_list.push(shape_mat);
     }
     pub fn save_model(&self, path: &str) {
         if !self.trained {
@@ -96,6 +105,7 @@ impl Alignment {
         // TODO: train the model
         self.num_regressor = num_regressor;
 
+        self.mean_shape = regressor::get_mean_shape(&self.shape_list, &self.bounding_box_list);
         self.regressor_list.reserve(num_regressor);
         for idx in 0..num_regressor {
             self.regressor_list.push(Regressor::new());
