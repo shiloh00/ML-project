@@ -1,5 +1,5 @@
 
-use nalgebra::{DMat,Indexable};
+use nalgebra::{DVec,DMat,Indexable,Mean,RowSlice,Dot};
 use super::{BoundingBox};
 
 pub struct Regressor {
@@ -80,6 +80,15 @@ pub fn similarity_transform() {
     unimplemented!();
 }
 
-pub fn calculate_covariance() {
-    unimplemented!();
+pub fn calculate_covariance(vec1: &Vec<f64>, vec2: &Vec<f64>) -> f64 {
+    //unimplemented!();
+    let mut vm1: DMat<f64> = DMat::from_row_vec(1, vec1.len(), vec1); 
+    let mut vm2: DMat<f64> = DMat::from_row_vec(1, vec2.len(), vec2); 
+    let mean1 = vm1.mean()[0];
+    let mean2 = vm2.mean()[0];
+    assert_eq!(vm1.ncols(), vm2.ncols());
+    let len: usize = vm1.ncols();
+    vm1 = vm1 - mean1;
+    vm2 = vm2 - mean2;
+    vm1.row_slice(0, 0, len).dot(&vm2.row_slice(0, 0, len)) / (len as f64)
 }
