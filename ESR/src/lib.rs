@@ -9,14 +9,21 @@ use std::path::Path;
 
 use regressor::Regressor;
 
+pub static NUM_REGRESSOR: usize = 10;
+pub static NUM_FERN: usize = 500;
+pub static NUM_INITIAL: usize = 20;
+pub static NUM_CANDIDATE_PIXEL: usize = 400;
+pub static NUM_FERN_PIXEL: usize = 5;
+
 pub struct Alignment {
     image_list: Vec<DMat<u8>>,
     bounding_box_list: Vec<BoundingBox>,
     shape_list: Vec<Vec<Point>>,
     regressor_list: Vec<Regressor>,
     mean_shape: Vec<Point>,
-//    num_regressor: usize,
-//    num_landmark: usize,
+    num_landmark: usize,
+    num_regressor: usize,
+    trained: bool,
 }
 
 pub struct BoundingBox {
@@ -33,6 +40,7 @@ pub struct Point {
     y: f64,
 }
 
+
 impl Alignment {
     pub fn new() -> Alignment {
         return Alignment{
@@ -41,13 +49,16 @@ impl Alignment {
             shape_list: Vec::new(),
             regressor_list: Vec::new(),
             mean_shape: Vec::new(),
-//            num_regressor: 10,
-//            num_landmark: 0,
+            num_landmark: 0,
+            num_regressor: 0,
+            trained: false,
         };
     }
     pub fn load_model(path: &str) -> Alignment {
         println!("Loading model from: {}", path);
-        let alignment = Alignment::new();
+        let mut alignment = Alignment::new();
+        // TODO load the model
+        alignment.trained = true;
         return alignment;
     }
     fn read_image(path: &str) -> DMat<u8> {
@@ -59,19 +70,48 @@ impl Alignment {
         img_mat
     }
     pub fn feed_sample(&mut self, path: &str, bounding_box: BoundingBox, shape: Vec<Point>) {
+        if self.num_landmark != 0 && self.num_landmark != shape.len() {
+            panic!("the shape size doesn't match");
+        }
+        self.num_landmark = shape.len();
         self.image_list.push(Alignment::read_image(path));
         self.bounding_box_list.push(bounding_box);
         self.shape_list.push(shape);
     }
     pub fn save_model(&self, path: &str) {
+        if !self.trained {
+            panic!("the model is not trained!");
+        }
         println!("Saving the model to: {}", path);
     }
 
-    pub fn train(&self, num_regressor: usize, num_fern_per_regressor: usize, 
-                 num_cand_pix: usize, num_fern_pix: usize, num_initial: usize) {
+    pub fn train(&mut self, num_regressor: usize, num_fern: usize, 
+                num_candidate_pixel: usize, num_fern_pixel: usize, num_initial: usize) {
+        if self.num_landmark == 0 {
+            panic!("the size of shape is zero!");
+        }
+        if !self.trained {
+            panic!("there is no trained model loaded!");
+        }
+        // TODO: train the model
+        self.num_regressor = num_regressor;
+
+        self.regressor_list.reserve(num_regressor);
+        for idx in 0..num_regressor {
+            self.regressor_list.push(Regressor::new());
+        }
+        
+        self.trained = true;
     }
 
-    pub fn predict(&self, path: &str, bounding_box: BoundingBox, num_initial: usize) -> Vec<Point> {
+    pub fn predict(&self, path: &str, bounding_box: BoundingBox) -> Vec<Point> {
+        if self.num_landmark == 0 {
+            panic!("the size of shape is zero!");
+        }
+        if !self.trained {
+            panic!("there is no trained model loaded!");
+        }
+        // TODO: begin to predict
         return Vec::new();
     }
 }

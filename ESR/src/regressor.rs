@@ -1,5 +1,4 @@
 
-
 pub struct Regressor {
     fern_list: Vec<Fern>,
 }
