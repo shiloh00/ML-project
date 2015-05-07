@@ -104,9 +104,19 @@ impl Alignment {
             panic!("there is no trained model loaded!");
         }
         // TODO: train the model
-        self.num_regressor = num_regressor;
+        let len: usize = self.shape_list.len();
+        assert!(len != 0);
+        for i in 0..len {
+            for j in 0..num_initial {
+                let mut index: usize = 0;
+                while index == i {
+                    //index = usize::rand() % len;
+                }
+            }
+        }
 
         self.mean_shape = regressor::get_mean_shape(&self.shape_list, &self.bounding_box_list);
+        self.num_regressor = num_regressor;
         self.regressor_list.reserve(num_regressor);
         for idx in 0..num_regressor {
             self.regressor_list.push(Regressor::new());
