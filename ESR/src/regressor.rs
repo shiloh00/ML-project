@@ -1,6 +1,6 @@
-
-use nalgebra::{DVec,DMat,Indexable,Mean,RowSlice,Dot};
+use nalgebra::{DVec,DMat,Indexable,Mean,RowSlice,Dot,Mat2,Cov};
 use super::{BoundingBox};
+use num::Zero;
 
 pub struct Regressor {
     fern_list: Vec<Fern>,
@@ -76,8 +76,79 @@ pub fn reproject_shape(shape: &DMat<f64>, bounding_box: &BoundingBox) -> DMat<f6
     res
 }
 
-pub fn similarity_transform() {
-    unimplemented!();
+pub fn similarity_transform(shape1: &DMat<f64>, shape2: &DMat<f64>) -> (DMat<f64>, f64) {
+    //unimplemented!();
+    let mut rotate_mat: DMat<f64> = DMat::new_zeros(2, 2);
+    let mut scale: f64 = 0.0f64;
+    let mut cx1: f64 = 0.0f64;
+    let mut cy1: f64 = 0.0f64;
+    let mut cx2: f64 = 0.0f64;
+    let mut cy2: f64 = 0.0f64;
+
+    assert_eq!(shape1.nrows(), shape2.nrows());
+    let len: usize = shape1.nrows();
+
+    for idx in 0..len {
+        cx1 += shape1[(idx, 0)];
+        cy1 += shape1[(idx, 1)];
+        cx2 += shape2[(idx, 0)];
+        cy2 += shape2[(idx, 1)];
+    }
+
+    cx1 /= len as f64;
+    cy1 /= len as f64;
+    cx2 /= len as f64;
+    cy2 /= len as f64;
+
+    let mut temp1: DMat<f64> = shape1.clone();
+    let mut temp2: DMat<f64> = shape2.clone();
+
+    for idx in 0..len {
+        temp1[(idx, 0)] -= cx1;
+        temp1[(idx, 1)] -= cy1;
+        temp2[(idx, 0)] -= cx2;
+        temp2[(idx, 1)] -= cy2;
+    }
+
+    let covar1: DMat<f64> = temp1.cov();
+    let covar2: DMat<f64> = temp2.cov();
+    let s1: f64 = simple_norm(&temp1);
+    let s2: f64 = simple_norm(&temp2);
+    scale = s1 / s2;
+    temp1 = temp1 / s1;
+    temp2 = temp2 / s2;
+    scale = s1 / s2;
+
+    let mut num_val: f64 = 0.0f64;
+    let mut den_val: f64 = 0.0f64;
+
+    for idx in 0..len {
+        num_val += temp1[(idx, 1)] * temp2[(idx, 0)] - temp1[(idx, 0)] * temp2[(idx, 1)];
+        den_val += temp1[(idx, 0)] * temp2[(idx, 0)] + temp1[(idx, 1)] * temp2[(idx, 1)];
+    }
+
+    let norm_val: f64 = (num_val * num_val + den_val * den_val).sqrt();
+    let sin_theta: f64 = num_val / norm_val;
+    let cos_theta: f64 = den_val / norm_val;
+    rotate_mat[(0,0)] = cos_theta;
+    rotate_mat[(0,1)] = -sin_theta;
+    rotate_mat[(1,0)] = sin_theta;
+    rotate_mat[(1,1)] = cos_theta;
+
+    (rotate_mat, scale)
+}
+
+fn simple_norm(mat: &DMat<f64>) -> f64 {
+    let mut sum: f64 = 0.0f64;
+    let h: usize = mat.nrows();
+    let w: usize = mat.ncols();
+    for i in 0..h {
+        for j in 0..w {
+            let val: f64 = mat[(i, j)];
+            sum += val * val;
+        }
+    }
+    sum.sqrt()
 }
 
 pub fn calculate_covariance(vec1: &Vec<f64>, vec2: &Vec<f64>) -> f64 {
